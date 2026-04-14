@@ -51,7 +51,7 @@ function normalizeItem( raw ) {
 		quantity:       raw.quantity,
 		quantityLimits: raw.quantity_limits || { minimum: 1, maximum: 9999, multiple_of: 1 },
 		unitPrice:      formatPrice( parseInt( raw.prices?.price || 0, 10 ) ),
-		lineTotal:      formatPrice( parseInt( raw.totals?.line_total || 0, 10 ) ),
+		lineTotal:      formatPrice( parseInt( raw.totals?.line_total || 0, 10 ) + parseInt( raw.totals?.line_total_tax || 0, 10 ) ),
 		permalink:      raw.permalink || '',
 		badges:         [],
 		children:       [],
@@ -59,7 +59,10 @@ function normalizeItem( raw ) {
 		parentKey:      null,
 		purchaseMode:   null,
 		subscriptionSummary: null,
-		metaRows:       ( raw.item_data || [] ).map( d => ({ key: d.name, value: d.display || d.value }) ),
+		metaRows:       [
+			...( raw.variation || [] ).map( v => ({ key: v.attribute, value: v.value }) ),
+			...( raw.item_data || [] ).map( d => ({ key: d.name, value: d.display || d.value }) ),
+		],
 		extensions:     raw.extensions || {},
 	};
 
@@ -79,11 +82,11 @@ function normalizeCart( raw ) {
 		items:         ( raw.items || [] ).map( normalizeItem ),
 		coupons:       raw.coupons || [],
 		totals: {
-			subtotal:      formatPrice( parseInt( raw.totals?.total_items || 0, 10 ) ),
+			subtotal:      formatPrice( parseInt( raw.totals?.total_items || 0, 10 ) + parseInt( raw.totals?.total_items_tax || 0, 10 ) ),
 			total:         formatPrice( parseInt( raw.totals?.total_price || 0, 10 ) ),
 			tax:           formatPrice( parseInt( raw.totals?.total_tax || 0, 10 ) ),
-			shipping:      formatPrice( parseInt( raw.totals?.total_shipping || 0, 10 ) ),
-			shippingRaw:   parseInt( raw.totals?.total_shipping || 0, 10 ),
+			shipping:      formatPrice( parseInt( raw.totals?.total_shipping || 0, 10 ) + parseInt( raw.totals?.total_shipping_tax || 0, 10 ) ),
+			shippingRaw:   parseInt( raw.totals?.total_shipping || 0, 10 ) + parseInt( raw.totals?.total_shipping_tax || 0, 10 ),
 		},
 		itemCount:     ( raw.items || [] ).reduce( ( sum, i ) => sum + i.quantity, 0 ),
 		needsShipping: raw.needs_shipping || false,

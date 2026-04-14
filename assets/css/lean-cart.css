@@ -87,6 +87,29 @@
 .lean-cart .cart-item-meta {
 	font-size: 11px;
 	color: var(--lc-text-muted);
+	margin: 0;
+	padding: 0;
+}
+
+.lean-cart .cart-item-meta-row {
+	display: flex;
+	gap: 0;
+	line-height: 1.5;
+}
+
+.lean-cart .cart-item-meta dt {
+	margin: 0;
+	font-weight: 400;
+}
+
+.lean-cart .cart-item-meta dt::after {
+	content: ':\00a0';
+}
+
+.lean-cart .cart-item-meta dd {
+	margin: 0;
+	font-weight: 500;
+	color: var(--lc-text);
 }
 
 .lean-cart .cart-item-subscription {

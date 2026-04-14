@@ -40,7 +40,7 @@ function renderItem( item ) {
 		: '';
 
 	const meta = item.metaRows.length
-		? `<span class="cart-item-meta">${ item.metaRows.map( r => esc( r.value ) ).join( ' · ' ) }</span>`
+		? `<dl class="cart-item-meta">${ item.metaRows.map( r => `<div class="cart-item-meta-row"><dt>${esc( r.key ) }</dt><dd>${esc( r.value ) }</dd></div>` ).join( '' ) }</dl>`
 		: '';
 
 	const badges = item.badges.length
