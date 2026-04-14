@@ -11,9 +11,26 @@ defined( 'ABSPATH' ) || exit;
 
 class Lean_Cart_Assets {
 
+	private string $js_ver;
+
 	public function __construct() {
+		$this->js_ver = $this->compute_js_ver();
+
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ] );
 		add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 2 );
+		add_action( 'wp_head', [ $this, 'print_importmap' ], 1 );
+	}
+
+	private function compute_js_ver(): string {
+		$js_dir = LEAN_CART_PATH . 'assets/js/';
+		$ver = 0;
+		foreach ( glob( $js_dir . '*.js' ) as $f ) {
+			$ver = max( $ver, filemtime( $f ) );
+		}
+		foreach ( glob( $js_dir . 'modules/*.js' ) as $f ) {
+			$ver = max( $ver, filemtime( $f ) );
+		}
+		return (string) ( $ver ?: LEAN_CART_VERSION );
 	}
 
 	public function enqueue(): void {
@@ -45,13 +62,11 @@ class Lean_Cart_Assets {
 	}
 
 	private function enqueue_scripts(): void {
-		$js_file = LEAN_CART_PATH . 'assets/js/cart-init.js';
-
 		wp_enqueue_script(
 			'lean-cart-init',
 			LEAN_CART_URL . 'assets/js/cart-init.js',
 			[],
-			file_exists( $js_file ) ? filemtime( $js_file ) : LEAN_CART_VERSION,
+			$this->js_ver,
 			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 
@@ -113,6 +128,28 @@ class Lean_Cart_Assets {
 		 * @param array $config The configuration array.
 		 */
 		return apply_filters( 'lean_cart_config', $config );
+	}
+
+	/**
+	 * Print an import map so sub-module URLs include a cache-busting version.
+	 */
+	public function print_importmap(): void {
+		if ( ! $this->js_ver ) {
+			return;
+		}
+
+		$base = LEAN_CART_URL . 'assets/js/';
+		$v    = $this->js_ver;
+
+		$map = [
+			'imports' => [
+				$base . 'cart-store.js' => $base . 'cart-store.js?ver=' . $v,
+				$base . 'cart-api.js'   => $base . 'cart-api.js?ver=' . $v,
+				$base . 'cart-ui.js'    => $base . 'cart-ui.js?ver=' . $v,
+			],
+		];
+
+		echo '<script type="importmap">' . wp_json_encode( $map ) . '</script>' . "\n";
 	}
 
 	/**
