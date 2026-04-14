@@ -59,7 +59,7 @@ class Lean_Cart_Assets {
 
 		wp_add_inline_script(
 			'lean-cart-init',
-			'const leanCartConfig = ' . wp_json_encode( $config ) . ';',
+			'window.leanCartConfig = ' . wp_json_encode( $config ) . ';',
 			'before'
 		);
 
@@ -118,11 +118,14 @@ class Lean_Cart_Assets {
 	/**
 	 * Add type="module" to the cart entry-point script tag.
 	 *
-	 * This enables native ES module imports with zero build step.
+	 * WordPress outputs type="text/javascript" by default.
+	 * We must replace it (not append) to avoid a duplicate type attribute,
+	 * which would cause the browser to use the first one (text/javascript)
+	 * and silently break ES module imports.
 	 */
 	public function add_module_type( string $tag, string $handle ): string {
 		if ( 'lean-cart-init' === $handle ) {
-			$tag = str_replace( ' src', ' type="module" src', $tag );
+			$tag = str_replace( 'type="text/javascript"', 'type="module"', $tag );
 		}
 		return $tag;
 	}
