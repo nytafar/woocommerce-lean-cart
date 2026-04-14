@@ -123,10 +123,15 @@ class Lean_Cart_Assets {
 	 * which would cause the browser to use the first one (text/javascript)
 	 * and silently break ES module imports.
 	 */
-	public function add_module_type( string $tag, string $handle ): string {
-		if ( 'lean-cart-init' === $handle ) {
-			$tag = str_replace( 'type="text/javascript"', 'type="module"', $tag );
+		public function add_module_type( string $tag, string $handle ): string {
+			if ( 'lean-cart-init' === $handle ) {
+				// Replace existing type attribute or add type="module" for ES module support
+				if ( strpos( $tag, 'type=' ) !== false ) {
+					$tag = preg_replace( '/type="[^"]*"/', 'type="module"', $tag );
+				} else {
+					$tag = str_replace( '<script ', '<script type="module" ', $tag );
+				}
+			}
+			return $tag;
 		}
-		return $tag;
-	}
 }
