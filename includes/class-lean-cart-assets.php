@@ -101,6 +101,7 @@ class Lean_Cart_Assets {
 				'minorUnit' => wc_get_price_decimals(),
 				'locale'    => str_replace( '_', '-', get_locale() ),
 			],
+			'showVariationLabels' => apply_filters( 'lean_cart_show_variation_labels', false ),
 			'modules'      => [
 				'subscriptions'    => class_exists( 'WC_Subscriptions' ),
 				'mixAndMatch'      => class_exists( 'WC_Mix_and_Match' ),

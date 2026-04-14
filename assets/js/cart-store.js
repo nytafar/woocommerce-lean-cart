@@ -60,8 +60,8 @@ function normalizeItem( raw ) {
 		purchaseMode:   null,
 		subscriptionSummary: null,
 		metaRows:       [
-			...( raw.variation || [] ).map( v => ({ key: v.attribute, value: v.value }) ),
-			...( raw.item_data || [] ).map( d => ({ key: d.name, value: d.display || d.value }) ),
+			...( raw.variation || [] ).map( v => ({ key: v.attribute, value: v.value, type: 'text' }) ),
+			...( raw.item_data || [] ).map( d => ({ key: d.name, value: d.display || d.value, type: 'text' }) ),
 		],
 		extensions:     raw.extensions || {},
 	};

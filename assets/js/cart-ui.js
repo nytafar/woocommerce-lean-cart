@@ -30,6 +30,16 @@ function cacheMountPoints() {
 
 const removeIcon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
+// ── Meta row rendering ─────────────────────────────────────────
+
+function renderMetaRow( row ) {
+	const label = config.showVariationLabels
+		? `<dt>${esc( row.key )}</dt>`
+		: `<dt class="screen-reader-text">${esc( row.key )}</dt>`;
+
+	return `<div class="cart-item-meta-row">${ label }<dd>${esc( row.value ) }</dd></div>`;
+}
+
 // ── Item rendering ──────────────────────────────────────────────
 
 function renderItem( item ) {
@@ -40,7 +50,7 @@ function renderItem( item ) {
 		: '';
 
 	const meta = item.metaRows.length
-		? `<dl class="cart-item-meta">${ item.metaRows.map( r => `<div class="cart-item-meta-row"><dt>${esc( r.key ) }</dt><dd>${esc( r.value ) }</dd></div>` ).join( '' ) }</dl>`
+		? `<dl class="cart-item-meta">${ item.metaRows.map( renderMetaRow ).join( '' ) }</dl>`
 		: '';
 
 	const badges = item.badges.length
