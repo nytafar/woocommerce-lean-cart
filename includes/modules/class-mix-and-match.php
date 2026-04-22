@@ -30,11 +30,13 @@ class Lean_Cart_Mix_And_Match {
 	/**
 	 * Reject MnM container add-to-cart requests that are missing mnm_config.
 	 *
-	 * Runs at priority 9 (before MnM's own validator at 10) so a missing
-	 * config turns into a visible 400 error instead of a silent 0-price add.
+	 * $request here is the add-to-cart *array* (not a WP_REST_Request), so
+	 * mnm_config lives under cart_item_data — it gets placed there by MnM's
+	 * own woocommerce_store_api_add_to_cart_data filter, which only fires
+	 * when the original request body carried an mnm_config key.
 	 *
-	 * @param \WC_Product      $product The product being added.
-	 * @param \WP_REST_Request $request The Store API request.
+	 * @param \WC_Product $product The product being added.
+	 * @param array       $request Add-to-cart data array.
 	 *
 	 * @throws \Automattic\WooCommerce\StoreApi\Exceptions\RouteException
 	 */
@@ -45,7 +47,7 @@ class Lean_Cart_Mix_And_Match {
 		if ( ! wc_mnm_is_product_container_type( $product ) ) {
 			return;
 		}
-		if ( isset( $request['mnm_config'] ) ) {
+		if ( isset( $request['cart_item_data']['mnm_config'] ) ) {
 			return;
 		}
 
