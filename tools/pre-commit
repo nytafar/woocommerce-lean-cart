@@ -1,9 +1,57 @@
 #!/bin/sh
-# Pre-commit hook: regenerate readme.txt from README.md + readme.meta.json
-# Install: cp tools/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Pre-commit hook: version sync + readme generation.
+#
+# On every commit this hook:
+#   1. Reads the canonical version from readme.meta.json (stableTag).
+#   2. Syncs it into woocommerce-lean-cart.php (Plugin header + LEAN_CART_VERSION).
+#   3. Regenerates readme.txt from README.md + readme.meta.json.
+#   4. Stages the changed files so the commit includes them.
+#
+# Install:
+#   cp tools/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#
+# Bump workflow:
+#   1. Update "stableTag" in readme.meta.json.
+#   2. Add a ### x.y.z section to the Changelog in README.md.
+#   3. Commit — this hook syncs everything else automatically.
 
-# Only run if README.md or readme.meta.json are staged
-if git diff --cached --name-only | grep -qE '^(README\.md|readme\.meta\.json)$'; then
-  php tools/generate-readme.php
-  git add readme.txt
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+META="$ROOT/readme.meta.json"
+MAIN="$ROOT/woocommerce-lean-cart.php"
+
+# ── 1. Read version from readme.meta.json ────────────────────────
+
+if [ ! -f "$META" ]; then
+  echo "pre-commit: readme.meta.json not found, skipping." >&2
+  exit 0
 fi
+
+VERSION=$(php -r "\$m = json_decode(file_get_contents('$META'), true); echo \$m['stableTag'] ?? '';" 2>/dev/null)
+
+if [ -z "$VERSION" ]; then
+  echo "pre-commit: could not read stableTag from readme.meta.json, skipping." >&2
+  exit 0
+fi
+
+# ── 2. Sync version into main plugin file ────────────────────────
+
+if [ -f "$MAIN" ]; then
+  # Update "Version: x.y.z" in plugin header.
+  sed -i "s/^ \* Version: .*/ * Version: ${VERSION}/" "$MAIN"
+  # Update LEAN_CART_VERSION constant.
+  sed -i "s/define( 'LEAN_CART_VERSION', '.*' );/define( 'LEAN_CART_VERSION', '${VERSION}' );/" "$MAIN"
+  git add "$MAIN"
+fi
+
+# ── 3. Regenerate readme.txt ─────────────────────────────────────
+
+if [ -f "$ROOT/README.md" ]; then
+  php "$ROOT/tools/generate-readme.php"
+  git add "$ROOT/readme.txt"
+fi
+
+# ── 4. Stage meta if it was modified ─────────────────────────────
+
+git add "$META" 2>/dev/null || true

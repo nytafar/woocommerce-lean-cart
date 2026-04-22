@@ -38,7 +38,8 @@ function section( string $md, string $title ): string {
 }
 
 /**
- * Strip GitHub-only elements: badges, images, details blocks, HTML tags.
+ * Strip GitHub-only elements: badges, images, details blocks, HTML tags,
+ * fenced code blocks (not supported in WP readme), and horizontal rules.
  */
 function strip_github( string $text ): string {
 	// Remove badge images.
@@ -49,6 +50,10 @@ function strip_github( string $text ): string {
 	$text = preg_replace( '/<details[\s\S]*?<\/details>/mi', '', $text );
 	// Remove horizontal rules.
 	$text = preg_replace( '/^---+\s*$/m', '', $text );
+	// Convert fenced code blocks to indented code (WP readme format).
+	$text = preg_replace_callback( '/^```[a-z]*\n(.*?)^```/ms', function( $m ) {
+		return preg_replace( '/^/m', '    ', $m[1] );
+	}, $text );
 	// Collapse multiple blank lines.
 	$text = preg_replace( '/\n{3,}/', "\n\n", $text );
 	return trim( $text );
@@ -59,7 +64,6 @@ function strip_github( string $text ): string {
  * ### heading -> = heading =
  */
 function convert_headings( string $text ): string {
-	// ### h3 -> = h3 =
 	$text = preg_replace( '/^###\s+(.+)$/m', '= $1 =', $text );
 	return $text;
 }
@@ -77,9 +81,7 @@ function convert_faq( string $text ): string {
  * Convert changelog from markdown ### headings to WP = heading = format.
  */
 function convert_changelog( string $text ): string {
-	// ### 1.3.0 -> = 1.3.0 =
 	$text = preg_replace( '/^###\s+(.+)$/m', '= $1 =', $text );
-	// - item -> * item
 	$text = preg_replace( '/^- /m', '* ', $text );
 	return $text;
 }
@@ -106,7 +108,7 @@ if ( $desc ) {
 	$out[] = '';
 	$out[] = '== Description ==';
 	$out[] = '';
-	$out[] = strip_github( $desc );
+	$out[] = strip_github( convert_headings( $desc ) );
 }
 
 // Installation.
@@ -136,11 +138,11 @@ if ( $faq ) {
 	$out[] = strip_github( convert_faq( $faq ) );
 }
 
-// Screenshots.
+// Screenshots (no admin UI — headless cart).
 $out[] = '';
 $out[] = '== Screenshots ==';
 $out[] = '';
-$out[] = 'No screenshots. Pages as Code is a CLI-only tool with no admin interface.';
+$out[] = 'No screenshots. Lean Cart is a headless cart layer with no admin interface — all visual output is controlled by your theme.';
 
 // Changelog.
 $changelog = section( $md, 'Changelog' );
