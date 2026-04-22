@@ -92,7 +92,9 @@ $out = array();
 // Header block.
 $out[] = '=== ' . $meta['pluginName'] . ' ===';
 $out[] = 'Contributors: ' . implode( ', ', $meta['contributors'] );
-$out[] = 'Author URI: ' . $meta['authorURI'];
+if ( ! empty( $meta['authorURI'] ) ) {
+	$out[] = 'Author URI: ' . $meta['authorURI'];
+}
 $out[] = 'Tags: ' . implode( ', ', $meta['tags'] );
 $out[] = 'Requires at least: ' . $meta['requiresAtLeast'];
 $out[] = 'Tested up to: ' . $meta['testedUpTo'];
