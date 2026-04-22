@@ -1,5 +1,6 @@
 === WooCommerce Lean Cart ===
 Contributors: lassejellum
+Author URI: https://jellum.net
 Tags: woocommerce, store-api, cart, mini-cart, developer-friendly
 Requires at least: 6.0
 Tested up to: 6.8

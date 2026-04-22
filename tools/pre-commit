@@ -39,9 +39,9 @@ fi
 
 if [ -f "$MAIN" ]; then
   # Update "Version: x.y.z" in plugin header.
-  sed -i "s/^ \* Version: .*/ * Version: ${VERSION}/" "$MAIN"
+  sed -i.bak "s/^ \* Version: .*/ * Version: ${VERSION}/" "$MAIN" && rm -f "$MAIN.bak"
   # Update LEAN_CART_VERSION constant.
-  sed -i "s/define( 'LEAN_CART_VERSION', '.*' );/define( 'LEAN_CART_VERSION', '${VERSION}' );/" "$MAIN"
+  sed -i.bak "s/define( 'LEAN_CART_VERSION', '.*' );/define( 'LEAN_CART_VERSION', '${VERSION}' );/" "$MAIN" && rm -f "$MAIN.bak"
   git add "$MAIN"
 fi
 

@@ -1,6 +1,7 @@
 {
   "pluginName": "WooCommerce Lean Cart",
   "contributors": ["lassejellum"],
+  "authorURI": "https://jellum.net",
   "tags": ["woocommerce", "store-api", "cart", "mini-cart", "developer-friendly"],
   "requiresAtLeast": "6.0",
   "testedUpTo": "6.8",
