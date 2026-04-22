@@ -24,6 +24,42 @@ export function formatPrice( minorUnitValue ) {
 	return formatter.format( minorUnitValue / divisor );
 }
 
+// ── Form extractor pipeline ─────────────────────────────────────
+
+const formExtractors = [];
+
+/**
+ * Register a form extractor function.
+ * Extension modules call this to contribute extra fields to the
+ * Store API add-to-cart payload (e.g., mnm_config for MnM products).
+ *
+ * @param {function} fn - Receives (formElement) and returns an object or null.
+ */
+export function addFormExtractor( fn ) {
+	formExtractors.push( fn );
+}
+
+/**
+ * Run all registered form extractors and merge their results.
+ *
+ * @param {HTMLFormElement} form - The form being submitted.
+ * @returns {object} Merged extra fields for the Store API body.
+ */
+export function runFormExtractors( form ) {
+	const extras = {};
+	for ( const fn of formExtractors ) {
+		try {
+			const result = fn( form );
+			if ( result && typeof result === 'object' ) {
+				Object.assign( extras, result );
+			}
+		} catch ( _ ) {
+			// A misbehaving module must not block add-to-cart.
+		}
+	}
+	return extras;
+}
+
 // ── Normalizer pipeline ─────────────────────────────────────────
 
 const normalizers = [];

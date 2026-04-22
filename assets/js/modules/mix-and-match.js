@@ -12,6 +12,30 @@
 const config = window.leanCartConfig;
 
 export function init( store ) {
+	// Feed MnM child quantities into the Store API add-to-cart call.
+	// Without this, Lean Cart's form interception strips the MnM payload
+	// and the container is added with 0 price and no children.
+	store.addFormExtractor( ( form ) => {
+		if ( ! form.classList.contains( 'mnm_form' ) ) return null;
+
+		const mnmConfig = {};
+		// Inputs are named "mnm_quantity[<child_id>]" where <child_id> is
+		// the child product_id (or variation_id if a variation is selected).
+		form.querySelectorAll( 'input[name^="mnm_quantity"]' ).forEach( ( el ) => {
+			if ( el.type === 'checkbox' && ! el.checked ) return;
+			const m = el.name.match( /mnm_quantity\[(\d+)\]/ );
+			if ( ! m ) return;
+			const qty = Number( el.value );
+			if ( ! Number.isFinite( qty ) || qty <= 0 ) return;
+			mnmConfig[ m[1] ] = ( mnmConfig[ m[1] ] || 0 ) + qty;
+		} );
+
+		// Always send mnm_config (even when empty) so MnM's validator
+		// can reject a misconfigured container instead of silently
+		// letting it through with 0 price.
+		return { mnm_config: mnmConfig };
+	} );
+
 	// Phase 1: Mark individual items as containers or children.
 	store.addNormalizer( ( item, raw ) => {
 		const ext = raw.extensions?.mix_and_match;

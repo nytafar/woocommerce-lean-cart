@@ -8,12 +8,14 @@
 
 import * as store from './cart-store.js';
 import * as ui from './cart-ui.js';
+import * as add from './cart-add.js';
 
 const config = window.leanCartConfig;
 
 // ── 1. Initialize UI (cache mount points, subscribe to events) ──
 
 ui.init();
+add.init();
 
 // ── 2. Cold-fetch guard ─────────────────────────────────────────
 //

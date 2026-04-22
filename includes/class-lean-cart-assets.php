@@ -147,6 +147,7 @@ class Lean_Cart_Assets {
 				$base . 'cart-store.js' => $base . 'cart-store.js?ver=' . $v,
 				$base . 'cart-api.js'   => $base . 'cart-api.js?ver=' . $v,
 				$base . 'cart-ui.js'    => $base . 'cart-ui.js?ver=' . $v,
+				$base . 'cart-add.js'   => $base . 'cart-add.js?ver=' . $v,
 			],
 		];
 

@@ -95,10 +95,11 @@ export function getCart() {
 	return request( 'cart' );
 }
 
-export function addItem( { id, quantity = 1, variation = [] } ) {
+export function addItem( payload ) {
+	const { id, quantity = 1, variation = [], ...rest } = payload;
 	return request( 'cart/add-item', {
 		method: 'POST',
-		body: { id, quantity, variation },
+		body: { id, quantity, variation, ...rest },
 	} );
 }
 
