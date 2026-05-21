@@ -110,7 +110,30 @@ function renderChildItem( child ) {
 
 // ── Totals rendering ────────────────────────────────────────────
 
-function renderTotals( totals ) {
+function renderRecurringTotals( recurringTotals = [] ) {
+	if ( ! recurringTotals.length ) return '';
+
+	return `
+		<div class="totals-divider"></div>
+		<div class="cart-recurring-totals">
+			${ recurringTotals.map( total => `
+				<div class="totals-row totals-row--recurring">
+					<span class="totals-label">${esc( i18n.subliumRecurring || 'Fornyes' )}</span>
+					<span class="totals-value">${esc( total.total )}</span>
+				</div>
+				${ total.nextPaymentDate ? `
+					<div class="totals-row totals-row--meta">
+						<span class="totals-label">${esc( i18n.subliumNextPayment || 'Neste betaling' )}</span>
+						<span class="totals-value">${esc( total.nextPaymentDate )}</span>
+					</div>
+				` : '' }
+			` ).join( '' ) }
+		</div>
+	`;
+}
+
+function renderTotals( state ) {
+	const totals = state.totals;
 	const freeShipping = totals.shippingRaw === 0;
 
 	return `
@@ -127,6 +150,7 @@ function renderTotals( totals ) {
 			<span class="totals-label">${esc( i18n.total )}</span>
 			<span class="totals-value">${esc( totals.total )}</span>
 		</div>
+		${ renderRecurringTotals( state.recurringTotals ) }
 	`;
 }
 
@@ -151,7 +175,7 @@ function render( state ) {
 
 	// Totals
 	mountPoints.totals.forEach( el => {
-		el.innerHTML = hasItems ? renderTotals( state.totals ) : '';
+		el.innerHTML = hasItems ? renderTotals( state ) : '';
 	} );
 
 	// Count badges

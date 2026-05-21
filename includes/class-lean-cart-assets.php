@@ -103,9 +103,10 @@ class Lean_Cart_Assets {
 			],
 			'showVariationLabels' => apply_filters( 'lean_cart_show_variation_labels', false ),
 			'modules'      => [
-				'subscriptions'    => class_exists( 'WC_Subscriptions' ),
-				'mixAndMatch'      => class_exists( 'WC_Mix_and_Match' ),
-				'allProductsSubs'  => class_exists( 'WCS_ATT' ),
+				'subscriptions'        => class_exists( 'WC_Subscriptions' ),
+				'mixAndMatch'          => class_exists( 'WC_Mix_and_Match' ),
+				'allProductsSubs'      => class_exists( 'WCS_ATT' ),
+				'subliumSubscriptions' => class_exists( '\Sublium_WCS\Plugin' ) || function_exists( 'sublium_init' ),
 			],
 			'i18n'         => apply_filters( 'lean_cart_i18n', [
 				'emptyCart'    => __( 'Handlekurven er tom', 'lean-cart' ),

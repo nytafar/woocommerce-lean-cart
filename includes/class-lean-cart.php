@@ -62,5 +62,10 @@ final class Lean_Cart {
 			require_once LEAN_CART_PATH . 'includes/modules/class-all-products-subs.php';
 			new Lean_Cart_All_Products_Subs();
 		}
+
+		if ( class_exists( '\Sublium_WCS\Plugin' ) || function_exists( 'sublium_init' ) ) {
+			require_once LEAN_CART_PATH . 'includes/modules/class-sublium-subscriptions.php';
+			new Lean_Cart_Sublium_Subscriptions();
+		}
 	}
 }

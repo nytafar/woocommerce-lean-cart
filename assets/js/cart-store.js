@@ -63,6 +63,7 @@ export function runFormExtractors( form ) {
 // ── Normalizer pipeline ─────────────────────────────────────────
 
 const normalizers = [];
+const cartNormalizers = [];
 
 /**
  * Register an item normalizer function.
@@ -72,6 +73,16 @@ const normalizers = [];
  */
 export function addNormalizer( fn ) {
 	normalizers.push( fn );
+}
+
+/**
+ * Register a cart normalizer function.
+ * Extension modules call this to enrich the full normalized cart.
+ *
+ * @param {function} fn - Receives (normalizedCart, rawCart) and returns normalizedCart.
+ */
+export function addCartNormalizer( fn ) {
+	cartNormalizers.push( fn );
 }
 
 /**
@@ -114,7 +125,7 @@ function normalizeItem( raw ) {
  * Normalize the full cart response.
  */
 function normalizeCart( raw ) {
-	return {
+	let cart = {
 		items:         ( raw.items || [] ).map( normalizeItem ),
 		coupons:       raw.coupons || [],
 		totals: {
@@ -127,7 +138,14 @@ function normalizeCart( raw ) {
 		itemCount:     ( raw.items || [] ).reduce( ( sum, i ) => sum + i.quantity, 0 ),
 		needsShipping: raw.needs_shipping || false,
 		extensions:    raw.extensions || {},
+		recurringTotals: [],
 	};
+
+	for ( const fn of cartNormalizers ) {
+		cart = fn( cart, raw );
+	}
+
+	return cart;
 }
 
 // ── State ───────────────────────────────────────────────────────

@@ -96,6 +96,10 @@ if ( config.modules.allProductsSubs ) {
 	import( './modules/all-products-subs.js' ).then( m => m.init( store ) );
 }
 
+if ( config.modules.subliumSubscriptions ) {
+	import( './modules/sublium-subscriptions.js' ).then( m => m.init( store ) );
+}
+
 // ── 6. Public API ───────────────────────────────────────────────
 
 window.leanCart = {

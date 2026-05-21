@@ -323,6 +323,21 @@
 	color: var(--lc-text-dark);
 }
 
+.lean-cart .cart-recurring-totals {
+	display: grid;
+	gap: 6px;
+}
+
+.lean-cart .totals-row--recurring .totals-label,
+.lean-cart .totals-row--recurring .totals-value {
+	font-weight: 600;
+}
+
+.lean-cart .totals-row--meta {
+	font-size: 0.875rem;
+	opacity: 0.78;
+}
+
 /* ── Empty state ───────────────────────────────────────────────── */
 
 .lean-cart [data-lean-cart="empty"] {
