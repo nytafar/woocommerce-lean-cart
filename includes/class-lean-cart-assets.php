@@ -143,16 +143,23 @@ class Lean_Cart_Assets {
 		$base = LEAN_CART_URL . 'assets/js/';
 		$v    = $this->js_ver;
 
-		$map = [
-			'imports' => [
-				$base . 'cart-store.js' => $base . 'cart-store.js?ver=' . $v,
-				$base . 'cart-api.js'   => $base . 'cart-api.js?ver=' . $v,
-				$base . 'cart-ui.js'    => $base . 'cart-ui.js?ver=' . $v,
-				$base . 'cart-add.js'   => $base . 'cart-add.js?ver=' . $v,
-			],
-		];
+		/**
+		 * Filter: lean_cart_importmap_imports
+		 *
+		 * A page may contain only ONE import map, so sibling plugins that ship
+		 * ES modules (e.g. lean-checkout) add their entries here instead of
+		 * printing a second <script type="importmap"> the browser would ignore.
+		 *
+		 * @param array<string,string> $imports Bare-URL => versioned-URL map.
+		 */
+		$imports = apply_filters( 'lean_cart_importmap_imports', [
+			$base . 'cart-store.js' => $base . 'cart-store.js?ver=' . $v,
+			$base . 'cart-api.js'   => $base . 'cart-api.js?ver=' . $v,
+			$base . 'cart-ui.js'    => $base . 'cart-ui.js?ver=' . $v,
+			$base . 'cart-add.js'   => $base . 'cart-add.js?ver=' . $v,
+		] );
 
-		echo '<script type="importmap">' . wp_json_encode( $map ) . '</script>' . "\n";
+		echo '<script type="importmap">' . wp_json_encode( [ 'imports' => $imports ] ) . '</script>' . "\n";
 	}
 
 	/**
